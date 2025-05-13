@@ -17,42 +17,38 @@ public class KeyStore1 {
     */
 
     // uniqueness of keys
-    /*@
+    /* @
         invariant (\forall int x;
-                  0 <= x < entries.length;
+                  0 <= x < a.length;
                         !(\exists int y;
-                        0 <= y < entries.length && y != x;
-                        entries[x].key == entries[y].key)
+                        0 <= y < a.length && y != x;
+                        ((Entry)a[x]).key == ((Entry)a[y]).key)
                   );
     */
 
     /*@
         normal_behaviour
+        requires entries != null;
         ensures (\forall int i;
-                0 <= i < entries.length;
-                entries[i].key == key  ==>  \result == entries[i].value);
-        assignable \strictly_nothing;
+                0 <= i < a.length;
+                ((Entry)a[i]).key == key  ==>  \result == ((Entry)a[i]).value);
 
-        also
-
-        normal_behavior
         ensures !(\exists int i;
-                0 <= i < entries.length;
-                entries[i].key == key  <==>  \result == null);
+                0 <= i < a.length;
+                ((Entry)a[i]).key == key  <==>  \result == null);
         assignable \strictly_nothing;
     */
-    /*@ nullable */ Object /*@ pure */ get(Object key) {
+    /*@ nullable */ Object /*@ strictly_pure */ get(Object key) {
         Object res = null;
         int counter = 0;
 
         /*@
+            loop_invariant 0 <= counter && (a.length == 0 || counter < a.length);
             loop_invariant res == null ==>
                                 !(\exists int i;
-                                0 <= i <= counter;
-                                entries[i].key == key);
-            loop_invariant (\forall int i;
-                            0 <= i <= counter;
-                            entries[i].key == key  ==>  res == entries[i].value);
+                                0 <= i < counter;
+                                ((Entry)a[i]).key == key);
+
             decreases entries.length - counter;
         */
         while (counter < entries.length) {
@@ -71,3 +67,5 @@ public class KeyStore1 {
 
     void remove(Object key) {}
 }
+
+
