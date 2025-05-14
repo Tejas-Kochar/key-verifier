@@ -143,7 +143,7 @@ public class KeyStore1 {
         else {
             int counter = 0;
             //@ ghost int ind;
-            //@ \set ind = -1;
+            //@ set ind = -1;
 
 //            i != ind ==> entries[i] == \old(entries[i]));
             /*@
