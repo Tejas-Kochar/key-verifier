@@ -45,13 +45,20 @@ public class KeyStore1 {
     /*@
         normal_behaviour
         requires entries != null;
-        ensures (\forall int i;
+        requires (\exists int i;
                 0 <= i < a.length;
-                ((Entry)a[i]).key == key  ==>  \result == ((Entry)a[i]).value);
+                ((Entry)a[i]).key == key);
+        ensures (\exists int i;
+                0 <= i < a.length;
+                ((Entry)a[i]).key == key && \result == ((Entry)a[i]).value);
+        assignable \strictly_nothing;
 
-        ensures !(\exists int i;
+        also
+
+        requires !(\exists int i;
                 0 <= i < a.length;
-                ((Entry)a[i]).key == key  <==>  \result == null);
+                ((Entry)a[i]).key == key);
+        ensures \result == null;
         assignable \strictly_nothing;
     */
     /*@ nullable */ Object /*@ strictly_pure */ get(Object key) {
@@ -59,19 +66,20 @@ public class KeyStore1 {
         int counter = 0;
 
         /*@
-            loop_invariant 0 <= counter && (a.length == 0 || counter < a.length);
+            loop_invariant 0 <= counter <= a.length;
             loop_invariant res == null ==>
-                                !(\exists int i;
+                                (\forall int i;
                                 0 <= i < counter;
-                                ((Entry)a[i]).key == key);
+                                ((Entry)a[i]).key != key);
 
-             loop_invariant (\forall int i;
+             loop_invariant res != null ==>
+                              (\exists int i;
                               0 <= i < counter;
-                              ((Entry)a[i]).key == key  ==>  res == ((Entry)a[i]).value);
+                              ((Entry)a[i]).key == key && res == ((Entry)a[i]).value);
             assignable \strictly_nothing;
             decreases a.length - counter;
         */
-        while (counter < entries.length) { // as of now, I think proof is not using uniquness part to show that forall holds
+        while (counter < entries.length) {
             if (key.equals(entries[counter].key)) {
                 res = entries[counter].value;
             }
