@@ -42,6 +42,7 @@ public class KeyStore1 {
             entries[i] != null && entries[i].key != null && entries[i].value != null);
     */
 
+    // constraint yet to add to get - nothing changes. Should be easily provable considering no writing allowed anywhere
     /*@
         normal_behaviour
         requires entries != null;
@@ -51,6 +52,8 @@ public class KeyStore1 {
         ensures (\exists int i;
                 0 <= i < a.length;
                 ((Entry)a[i]).key == key && \result == ((Entry)a[i]).value);
+        ensures
+            \old(a) == a;
         assignable \strictly_nothing;
 
         also
@@ -59,6 +62,8 @@ public class KeyStore1 {
                 0 <= i < a.length;
                 ((Entry)a[i]).key == key);
         ensures \result == null;
+        ensures
+            \old(a) == a;
         assignable \strictly_nothing;
     */
     /*@ nullable */ Object /*@ strictly_pure */ get(Object key) {
@@ -89,9 +94,82 @@ public class KeyStore1 {
     }
 
     /*@
+        normal_behaviour
+        requires
+            get(key) == null;
+        ensures
+            get(key) == value;
+        ensures
+            a == \seq_concat(\old(a), \seq_singleton(key));
 
+        also
+
+        normal_behaviour
+        requires
+            get(key) != null;
+        ensures
+            get(key) == value;
+        ensures
+            (\forall int i;
+            0 <= i < a.length;
+            ((Entry)a[i]).key != key ==> a[i] == \old(a[i]));
     */
-    void put(Object key, Object value) {}
+    void put(Object key, Object value) {
+        if (get(key) == null) {
+            Entry[] ne = new Entry[entries.length + 1];
+
+            int counter = 0;
+
+            /*@
+                loop_invariant
+                    0 <= counter <= a.length;
+                loop_invariant
+                    (\forall int i;
+                    0 <= i < counter;
+                    entries[i] == ne[i]);
+                decreasing
+                    a.length - counter;
+                assignable
+                    ne[0..ne.length-1];
+            */
+            while (counter < entries.length) {
+                ne[counter] = entries[counter];
+            }
+
+            ne[counter] = new Entry(key, value);
+
+            entries = ne;
+        }
+        else {
+            int counter = 0;
+            //@ ghost int ind;
+            //@ \set ind = -1;
+
+//            i != ind ==> entries[i] == \old(entries[i]));
+            /*@
+                loop_invariant
+                    0 <= counter <= a.length;
+                loop_invariant
+                    (\forall int i;
+                    0 <= i < counter;
+                    ((Entry)\old(a[i])).key != key  ==>  \old(a[i]) == a[i]);
+                loop_invariant
+                    (\forall int i;
+                    0 <= i < counter;
+                    ((Entry)\old(a[i])).key == key  ==>  entries[i].value == value);
+                decreasing
+                    a.length - counter;
+                assignable
+                    entries[*];
+            */
+            while (counter < entries.length) {
+                if (key.equals(entries[counter].key)) {
+                    //@ set ind = counter;
+                    entries[counter].value = value;
+                }
+            }
+        }
+    }
 
     void remove(Object key) {}
 
