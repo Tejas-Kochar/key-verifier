@@ -13,8 +13,17 @@ public class KeyStore1 {
     Entry[] entries = new Entry[0];
     /*@
         model \seq a;
+        model \map m;
         represents a = \dl_array2seq(entries);
     */
+
+    /*@
+        ensures
+            entries != null && entries.length == 0;
+    */
+    KeyStore1() {
+        entries = new Entry[0];
+    }
 
     // uniqueness of keys
     /*@
@@ -22,7 +31,7 @@ public class KeyStore1 {
                   0 <= x < a.length;
                         !(\exists int y;
                         x <= y < a.length;
-                        ((Entry)a[x]).key == ((Entry)a[y]).key) ==> x == y
+                        ((Entry)a[x]).key == ((Entry)a[y]).key ==> x == y)
                   );
     */
     // non-null (should be by default...)
