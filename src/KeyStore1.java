@@ -30,8 +30,8 @@ public class KeyStore1 {
         invariant (\forall int x;
                   0 <= x < a.length;
                         !(\exists int y;
-                        x <= y < a.length;
-                        ((Entry)a[x]).key == ((Entry)a[y]).key ==> x == y)
+                        x < y < a.length;
+                        ((Entry)a[x]).key == ((Entry)a[y]).key)
                   );
     */
     // non-null (should be by default...)
@@ -100,7 +100,7 @@ public class KeyStore1 {
         ensures
             get(key) == value;
         ensures
-            a == \seq_concat(\old(a), \seq_singleton(key));
+            a[0..a.length-1] == \old(a);
 
         also
 
@@ -173,6 +173,18 @@ public class KeyStore1 {
 
     void remove(Object key) {}
 
+    /* @
+        model boolean indexOf(Object key) {
+            \if
+                a.length > 0
+            \then
+
+            return (\exists int i;
+                    0 <= i < a.length;
+                    ((Entry)a[i]).key == key);
+        }
+     */
+
     /*@
         normal_behaviour
         requires entries != null;
@@ -181,7 +193,7 @@ public class KeyStore1 {
                             ((Entry)a[i]).key == key));
         assignable \strictly_nothing;
     */
-    boolean /*@ strictly_pure */ contains(Object key) {
+    boolean /*@ strictly_pure */ contains1(Object key) {
         int counter = 0;
         boolean res = false;
         /*@
