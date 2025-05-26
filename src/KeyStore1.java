@@ -2,33 +2,37 @@
 
 public class KeyStore1 {
     static class Entry {
-        Object key, value;
+        final Object key;
+        Object value;
 
-        //@ public model \locset fp;
-        //@ represents fp = key, value;
+        // @ public model \locset fp;
+        // @ represents fp = key, value;
 
         public Entry(Object key, Object value) {
             this.key = key;
             this.value = value;
         }
 
-        public boolean equals(Object o) {
-            if (this == o) return true;
+//        /* @
+//            ensures \result == (\typeof(o) == )
+//        */
+//        public boolean /* @pure*/ equals(Object o) {
+//            if (this == o) return true;
 //            if (o == null || getClass() != o.getClass()) return false;
-
-            Entry entry = (Entry) o;
-            return key.equals(entry.key) && value.equals(entry.value);
-        }
+//
+//            Entry entry = (Entry) o;
+//            return key.equals(entry.key) && value.equals(entry.value);
+//        }
     }
 
     private /*@nullable@*/ Entry[] entries = new Entry[10];
     private int size;
 
-    //@ public model \locset footprint;
-    //@ public accessible \inv: footprint;
-    //@ public accessible footprint: footprint;
+    // @ public model \locset footprint;
+    // @ public accessible \inv: footprint;
+    // @ public accessible footprint: footprint;
 
-    //@ private represents footprint = entries, entries[*].fp, size;
+    // @ private represents footprint = entries, entries[*].fp, size;
 
     /*@
         private invariant entries != null;
@@ -55,36 +59,46 @@ public class KeyStore1 {
 
 
     /*@ public normal_behaviour
-        ensures size == 0 && \fresh(footprint);
+        ensures size == 0;
     */
     public /*@pure@*/ KeyStore1() {
         entries = new Entry[0];
     }
 
     /*@ public normal_behaviour
-       accessible footprint;
-       ensures \result == (\exists int i; 0 <= i && i < size; entries[i].key.equals(o));
+       ensures \result == (size > 0 && (\exists int i; 0 <= i && i < size; entries[i].key == o));
     */
     public boolean /*@pure*/ contains(Object o) {
         /*@ loop_invariant 0 <= i && i <= size
-          @  && (\forall int x; 0 <= x && x < i; !entries[x].key.equals(o));
+          @  && (\forall int x; 0 <= x && x < i; entries[x].key != o);
           @ assignable \nothing;
           @ decreases size - i;
           @*/
         for(int i = 0; i < size; i++) {
-            if(entries[i].key.equals(o)) {
+            if(entries[i].key == o) {
                 return true;
             }
         }
         return false;
     }
 
-
+    /*@ private normal_behaviour
+        requires 0 <= from <= size;
+        ensures \result == (size > 0 && (\exists int i; from <= i && i < size; entries[i].key == o));
+        measured_by size - from;
+     */
+    private /*@pure@*/ boolean containsRec(final Object o, int from) {
+        if (from == size)
+            return false;
+        else if (entries[from].key == o)
+            return true;
+        else
+            return containsRec(o, from + 1);
+    }
 
     /*@
         public normal_behaviour
         requires contains(key);
-        accessible footprint;
         ensures (\exists int i; 0 <= i < size;
                 entries[i].key == key && \result == entries[i].value);
         ensures \old(size) == size;
@@ -107,7 +121,7 @@ public class KeyStore1 {
             decreases size - i;
         */
         for (int i = 0; i < size; i++) {
-            if(entries[i].key.equals(key)) {
+            if(entries[i].key == key) {
                 return entries[i].value;
             }
         }
