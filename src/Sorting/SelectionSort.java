@@ -1,3 +1,7 @@
+/* from key textbook */
+
+package Sorting;
+
 class SortPerm {
   public int[] a;
 
@@ -30,12 +34,14 @@ class SortPerm {
   /*@ public normal_behavior
     @ requires a.length > 0; 
     @ ensures  \dl_seqPerm(seqa,\old(seqa));
+//    @ ensures (\forall int x, y; 0 <= x & x < y & y < a.length; a[x] >= a[y]);
     @*/ 
   void sort() {
     int pos = 0; 
     int idx = 0;
     /*@ loop_invariant 0<=pos && pos<=a.length && 0<=idx && idx<a.length 
       @   && \dl_seqPerm(seqa,\old(seqa));
+      @ loop_invariant (\forall int x, y; 0 <= x & x < y & y < pos; a[x] >= a[y]);
       @ assignable a[*];
       @ decreases a.length - pos; 
       @*/
