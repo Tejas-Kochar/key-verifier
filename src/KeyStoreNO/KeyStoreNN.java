@@ -28,7 +28,6 @@ public class KeyStoreNN {
     /*@ public normal_behaviour
         ensures (\exists int i; 0 <= i && i < size; keys[i] == key) ==> 0 <= \result < size && keys[\result] == key;
         ensures !(\exists int i; 0 <= i && i < size; keys[i] == key) ==> \result == -1;
-//       ensures \result == -1 ? !contains(key) : keys[\result] == key;
     */
     public int /*@pure*/ findIndex(int key) {
         /*@ loop_invariant 0 <= i && i <= size
@@ -48,7 +47,7 @@ public class KeyStoreNN {
     /*@
         public normal_behaviour
         ensures contains(key) ==> \result == values[findIndex(key)];
-        ensures !contains(key) ==> \result == EMPTY;
+        ensures !contains(key) ==> \result == NOT_PRESENT;
         assignable \nothing;
     */
     public int /*@pure*/ get(int key) {

@@ -4,6 +4,8 @@ public class KeyStoreNO {
     private int[] keys = new int[10];
     private /*@nullable*/ Object[] values = new Object[10];
 
+    private static final Object NOT_PRESENT = new Object();
+
     private int size;
 
     /*@
@@ -21,23 +23,12 @@ public class KeyStoreNO {
        ensures \result == (size > 0 && (\exists int i; 0 <= i && i < size; keys[i] == key));
     */
     public boolean /*@pure*/ contains(int key) {
-        /*@ loop_invariant 0 <= i && i <= size
-          @  && (\forall int x; 0 <= x && x < i; keys[x] != key);
-          @ assignable \nothing;
-          @ decreases size - i;
-          @*/
-        for(int i = 0; i < size; i++) {
-            if(keys[i] == key) {
-                return true;
-            }
-        }
-        return false;
+        return findIndex(key) != -1;
     }
 
     /*@ public normal_behaviour
-        ensures contains(key) ==> 0 <= \result < size && keys[\result] == key;
-        ensures !contains(key) ==> \result == -1;
-//       ensures \result == -1 ? !contains(key) : keys[\result] == key;
+        ensures (\exists int i; 0 <= i && i < size; keys[i] == key) ==> 0 <= \result < size && keys[\result] == key;
+        ensures !(\exists int i; 0 <= i && i < size; keys[i] == key) ==> \result == -1;
     */
     public int /*@pure*/ findIndex(int key) {
         /*@ loop_invariant 0 <= i && i <= size
@@ -57,43 +48,17 @@ public class KeyStoreNO {
     /*@
         public normal_behaviour
         ensures contains(key) ==> \result == values[findIndex(key)];
-        ensures !contains(key) ==> \result == null;
-        assignable \strictly_nothing;
-//        requires contains(key);
-//        ensures (\exists int i; 0 <= i < size;
-//                keys[i] == key && \result == values[i]);
-//        ensures \old(size) == size;
-//        assignable \strictly_nothing;
-//
-//        also
-//
-//        public normal_behaviour
-//        requires !contains(key);
-//        ensures \result == null;
-//        ensures \old(size) == size;
-//        assignable \strictly_nothing;
+        ensures !contains(key) ==> \result == NOT_PRESENT;
+        assignable \nothing;
     */
-    public /*@nullable*/ Object /*@pure*/ get(int key) {
+    public Object /*@pure*/ get(int key) {
         int index = findIndex(key);
         if(index == -1) {
-            return null;
+            return NOT_PRESENT;
         }
         else {
             return values[index];
         }
-
-//        /*@
-//            loop_invariant 0 <= i <= size
-//                && (\forall int x; 0 <= x && x < i; keys[x] != key);
-//            assignable \strictly_nothing;
-//            decreases size - i;
-//        */
-//        for (int i = 0; i < size; i++) {
-//            if(keys[i] == key) {
-//                return values[i];
-//            }
-//        }
-//        return null;
     }
 
     /*@ public normal_behavior
@@ -121,9 +86,7 @@ public class KeyStoreNO {
 
     /*@
         public normal_behaviour
-//        requires contains(key) || size < keys.length;
-//        ensures get(key) == value;
-//        ensures (\forall int x; 0 <= x < \old(size) && keys[x] != key; keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
+        requires value != NOT_PRESENT;
         requires !contains(key) && size < keys.length;
         ensures get(key) == value;
         ensures (\forall int x; 0 <= x < size - 1; keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
@@ -133,19 +96,17 @@ public class KeyStoreNO {
         also
 
         public normal_behaviour
+        requires value != NOT_PRESENT;
         requires contains(key);
         ensures get(key) == value;
         ensures size == \old(size);
-        ensures (\forall int x; 0 <= x < size && x != findIndex(key);
-                keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
-//        assignable values[*];
+        ensures (\forall int x; 0 <= x < size;
+                keys[x] == \old(keys[x]) && (key ==  keys[x] || values[x] == \old(values[x])));
+        assignable values[*];
     */
-    public void putV2(int key, Object value) {
+    public void put(int key, Object value) {
         int index = findIndex(key);
         if (index == -1) {
-//            if (size == keys.length) {
-//                enlarge();
-//            }
             keys[size] = key;
             values[size++] = value;
         }
@@ -156,57 +117,19 @@ public class KeyStoreNO {
 
     /*@
         public normal_behaviour
-        requires !contains(key);
-        ensures get(key) == value;
-        ensures (\forall int x; 0 <= x < size - 1; keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
-        ensures size == \old(size) + 1;
+        requires contains(key);
+        ensures !contains(key);
+        ensures size == \old(size) - 1;
+        ensures (\forall int x; 0 <= x < size;
+                (keys[x] == \old(keys[x]) && values[x] == \old(values[x]))
+                || (keys[x] == \old(keys[size-1]) && values[x] == \old(values[size-1])));
 
         also
 
         public normal_behaviour
-        requires contains(key);
-        ensures get(key) == value;
-        ensures size == \old(size);
-        ensures (\forall int x; 0 <= x < size;
-            keys[x] != key ==> keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
-    */
-    public void put(int key, Object value) {
-        if (!contains(key)) {
-            if (size == keys.length) {
-                enlarge();
-            }
-
-            keys[size] = key;
-            values[size] = value;
-            size ++;
-        }
-        else {
-            for (int i = 0; i < size; i++) {
-            /*@
-                loop_invariant 0 <= i <= size;
-                loop_invariant (\forall int x; 0 <= x < i;
-                    keys[x] != key ==> keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
-                loop_invariant (\forall int x; 0 <= x < i;
-                    \old(keys[x]) == key  ==>  (values[x] == value && keys[x] == key));
-                decreasing size - i;
-                assignable keys[*], values[*];
-            */
-                if (keys[i] == key) {
-                    values[i] = value;
-                    break;
-                }
-            }
-        }
-    }
-
-    /*@
-        public normal_behaviour
+        requires !contains(key);
         ensures !contains(key);
-//        ensures size == \old(size) - (contains(key) ? 1 : 0);
-        ensures (\forall int x; 0 <= x < size;
-                (keys[x] == \old(keys[x]) && values[x] == \old(values[x]))
-                || (keys[x] == \old(keys[size-1]) && values[x] == \old(values[size-1])));
-//        ensures (\exists int x; 0 <= x < size; keys[x] == \old(keys[size-1]) && values[x] == \old(values[size-1]));
+        assignable \nothing;
      */
     public void remove(int key) {
         int index = findIndex(key);
