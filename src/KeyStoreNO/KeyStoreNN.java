@@ -4,7 +4,7 @@ public class KeyStoreNN {
     private int[] keys = new int[10];
     private int[] values = new int[10];
 
-    private static final int EMPTY = Integer.MIN_VALUE;
+    private static final int NOT_PRESENT = Integer.MIN_VALUE;
 
     private int size;
 
@@ -54,7 +54,7 @@ public class KeyStoreNN {
     public int /*@pure*/ get(int key) {
         int index = findIndex(key);
         if(index == -1) {
-            return EMPTY;
+            return NOT_PRESENT;
         }
         else {
             return values[index];
@@ -102,7 +102,7 @@ public class KeyStoreNN {
                 keys[x] == \old(keys[x]) && (key ==  keys[x] || values[x] == \old(values[x])));
         assignable values[*];
     */
-    public void putV2(int key, int value) {
+    public void put(int key, int value) {
         int index = findIndex(key);
         if (index == -1) {
             keys[size] = key;
@@ -110,51 +110,6 @@ public class KeyStoreNN {
         }
         else {
             values[index] = value;
-        }
-    }
-
-    /*@
-        public normal_behaviour
-        requires !contains(key);
-        ensures get(key) == value;
-        ensures (\forall int x; 0 <= x < size - 1; keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
-        ensures size == \old(size) + 1;
-
-        also
-
-        public normal_behaviour
-        requires contains(key);
-        ensures get(key) == value;
-        ensures size == \old(size);
-        ensures (\forall int x; 0 <= x < size;
-            keys[x] != key ==> keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
-    */
-    public void put(int key, int value) {
-        if (!contains(key)) {
-            if (size == keys.length) {
-                enlarge();
-            }
-
-            keys[size] = key;
-            values[size] = value;
-            size ++;
-        }
-        else {
-            for (int i = 0; i < size; i++) {
-            /*@
-                loop_invariant 0 <= i <= size;
-                loop_invariant (\forall int x; 0 <= x < i;
-                    keys[x] != key ==> keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
-                loop_invariant (\forall int x; 0 <= x < i;
-                    \old(keys[x]) == key  ==>  (values[x] == value && keys[x] == key));
-                decreasing size - i;
-                assignable keys[*], values[*];
-            */
-                if (keys[i] == key) {
-                    values[i] = value;
-                    break;
-                }
-            }
         }
     }
 
