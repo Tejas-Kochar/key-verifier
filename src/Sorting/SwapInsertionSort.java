@@ -32,7 +32,7 @@ public class SwapInsertionSort {
     /*@
         public normal_behaviour
         requires 1 <= i < a.length && a.length > 0;
-        requires (\forall int x, y; 0 <= x < i && 0 <= y < i; x < y ==> a[x] <= a[y]);
+        requires (\forall int x; 0 <= x < i-1; a[x] <= a[x+1]);
 //        ensures \dl_seqPerm(seqa, \old(seqa));
         ensures (\forall int x; 0 <= x < i; a[x] <= a[x+1]);
         assignable a[0..i+1];
