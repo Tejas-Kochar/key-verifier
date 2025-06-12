@@ -1,8 +1,8 @@
-/* from key textbook */
+/* from key textbook, slightly modified */
 
 package Sorting;
 
-class SortPerm {
+class Sort {
   public int[] a;
 
   /*@ model \seq seqa;
@@ -34,24 +34,36 @@ class SortPerm {
   /*@ public normal_behavior
     @ requires a.length > 0; 
     @ ensures  \dl_seqPerm(seqa,\old(seqa));
-//    @ ensures (\forall int x, y; 0 <= x & x < y & y < a.length; a[x] >= a[y]);
+    @ ensures (\forall int x; 0 <= x < a.length-1; a[x] >= a[x+1]);
     @*/ 
   void sort() {
     int pos = 0; 
     int idx = 0;
     /*@ loop_invariant 0<=pos && pos<=a.length && 0<=idx && idx<a.length 
       @   && \dl_seqPerm(seqa,\old(seqa));
-      @ loop_invariant (\forall int x, y; 0 <= x & x < y & y < pos; a[x] >= a[y]);
+      @ loop_invariant (\forall int x; 0 <= x < pos-1; a[x] >= a[x+1]);
       @ assignable a[*];
       @ decreases a.length - pos; 
       @*/
     while (pos < a.length-1) {
       idx = max(pos);
-      int tmp = a[idx]; 
-      a[idx] = a[pos]; 
+      // swap(pos, idx);
+      int tmp = a[idx];
+      a[idx] = a[pos];
       a[pos] = tmp;
       pos = pos+1;
     } 
+  }
+
+  /*@ normal_behaviour
+        requires 0 <= i < a.length && 0 <= j < a.length;
+        ensures \dl_seqPerm(seqa, \old(seqa));
+        assignable a[i], a[j];
+     */
+  void swap(int i, int j) {
+    int temp = a[i];
+    a[i] = a[j];
+    a[j] = temp;
   }
 }
 

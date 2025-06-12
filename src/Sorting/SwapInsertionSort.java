@@ -1,6 +1,6 @@
 package Sorting;
 
-public class SwapInsertionSort {
+class SwapInsertionSort {
     public int[] a;
 
     /*@
@@ -9,25 +9,6 @@ public class SwapInsertionSort {
      */
 
 
-
-    /*@
-        public normal_behaviour
-        requires a.length > 0;
-//        ensures \dl_seqPerm(seqa, \old(seqa));
-        ensures (\forall int x; 0 <= x < a.length-1; a[x] <= a[x+1]);
-     */
-    void sort() {
-        /*@
-            loop_invariant 1 <= i <= a.length;
-//            loop_invariant \dl_seqPerm(seqa, \old(seqa));
-            loop_invariant (\forall int x; 0 <= x < i-1; a[x] <= a[x+1]);
-            assignable a[*];
-            decreases a.length - i;
-         */
-        for (int i = 1; i < a.length; i++) {
-            shift(i);
-        }
-    }
 
     /*@
         public normal_behaviour
@@ -49,6 +30,25 @@ public class SwapInsertionSort {
             int tmp = a[j+1];
             a[j+1] = a[j];
             a[j] = tmp;
+        }
+    }
+
+    /*@
+        public normal_behaviour
+        requires a.length > 0;
+//        ensures \dl_seqPerm(seqa, \old(seqa));
+        ensures (\forall int x; 0 <= x < a.length-1; a[x] <= a[x+1]);
+     */
+    void sort() {
+        /*@
+            loop_invariant 1 <= i <= a.length;
+//            loop_invariant \dl_seqPerm(seqa, \old(seqa));
+            loop_invariant (\forall int x; 0 <= x < i-1; a[x] <= a[x+1]);
+            assignable a[*];
+            decreases a.length - i;
+         */
+        for (int i = 1; i < a.length; i++) {
+            shift(i);
         }
     }
 }
