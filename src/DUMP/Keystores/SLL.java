@@ -1,3 +1,5 @@
+package DUMP.Keystores;
+
 class SLL {
     //@ instance model \seq m_list;
 
@@ -71,7 +73,7 @@ class SLL {
     }
 
     /*@ normal_behavior
-      @ ensures \result == (\exists \bigint i; 0 <= i && i < length; ((SLL)m_list[i]).key == key);
+      @ ensures \result == (\exists \bigint i; 0 <= i && i < length; ((DUMP.Keystors.SLL)m_list[i]).key == key);
       @*/
     boolean /*@ strictly_pure @*/ containsIterative(int key) {
         boolean found = false;
@@ -90,19 +92,19 @@ class SLL {
     }
 
     /*@ normal_behavior
-      @ ensures \result == (\exists \bigint i; 0 <= i && i < length; ((SLL)m_list[i]).key == key);
+      @ ensures \result == (\exists \bigint i; 0 <= i && i < length; ((DUMP.Keystors.SLL)m_list[i]).key == key);
       @ measured_by length;
       @*/
     boolean /*@ strictly_pure @*/ contains(int key) {
         return this.key == key || (tail != null && tail.contains(key));
     }
-//        SLL current = this;
+//        DUMP.Keystors.SLL current = this;
 //
 //        /*@ loop_invariant current != null ==>
 //          @   (\forall \bigint j; 0 <= j && j < (\bigint)(this.length - (current == this ? 0 : current.length + 1));
-//          @     ((SLL)m_list[j]).key != key);
+//          @     ((DUMP.Keystors.SLL)m_list[j]).key != key);
 //          @ loop_invariant current == null ==>
-//          @   (\forall \bigint j; 0 <= j && j < this.length; ((SLL)m_list[j]).key != key);
+//          @   (\forall \bigint j; 0 <= j && j < this.length; ((DUMP.Keystors.SLL)m_list[j]).key != key);
 //          @ decreases current == null ? 0 : current.length;
 //          @*/
 //        while (current != null) {
@@ -116,7 +118,7 @@ class SLL {
 
     /*@ normal_behavior
       @ requires contains(key);
-      @ ensures (\exists \bigint i; 0 <= i && i < length; ((SLL)m_list[i]).key == key && \result == ((SLL)m_list[i]).value);
+      @ ensures (\exists \bigint i; 0 <= i && i < length; ((DUMP.Keystors.SLL)m_list[i]).key == key && \result == ((DUMP.Keystors.SLL)m_list[i]).value);
       @ assignable \nothing;
       @ exceptional_behavior
       @ requires !contains(key);
@@ -127,9 +129,9 @@ class SLL {
         
         /*@ loop_invariant current != null ==>
           @   (\forall \bigint j; 0 <= j && j < (\bigint)(this.length - (current == this ? 0 : current.length + 1));
-          @     ((SLL)m_list[j]).key != key);
+          @     ((DUMP.Keystors.SLL)m_list[j]).key != key);
           @ loop_invariant current == null ==>
-          @   (\forall \bigint j; 0 <= j && j < this.length; ((SLL)m_list[j]).key != key);
+          @   (\forall \bigint j; 0 <= j && j < this.length; ((DUMP.Keystors.SLL)m_list[j]).key != key);
           @ decreases current == null ? 0 : current.length;
           @*/
         while (current != null) {

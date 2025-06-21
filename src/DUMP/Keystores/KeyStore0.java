@@ -1,4 +1,5 @@
 // @ classpath "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/rt.jar"
+package DUMP.Keystores;
 
 public class KeyStore0 {
 
@@ -15,7 +16,7 @@ public class KeyStore0 {
       @ represents seq_store = \dl_array2seq(store);
       @*/
 
-    /*@ invariant (\forall int i;
+    /* @ invariant (\forall int i;
                   0 <= i && i < seq_store.length;
                   seq_store[i] == null || i == hash(((Entry)seq_store[i]).key));
         invariant store != null && store.length > 0;
@@ -99,6 +100,14 @@ public class KeyStore0 {
       @*/
     /*@ strictly_pure @*/ int hash(int key) {
         return key % store.length;
+    }
+
+    /*@ normal_behaviour
+      @ requires len > 0;
+      @ ensures 0 <= \result < len;
+      @*/
+    /*@ strictly_pure @*/ int hash(int key, int len) {
+        return key % len;
     }
 }
 

@@ -1,4 +1,4 @@
-package Sorting;
+package DUMP.Sorting;
 
 public class InsertionSort {
     int[] a;
@@ -28,16 +28,22 @@ public class InsertionSort {
             int key = a[i];
             int j = i - 1;
 
-            j = shift(key, i);
-            a[j + 1] = key;
+            int jc = shift(key, i);
+
+            // @ assert \dl_seqPerm(\seq_concat(seqa[0..jc+1], seqa[jc+2..i+1]), \old(seqa[0..i]));
+//            a[jc + 1] = key;
         }
     }
 
     /*@
-        requires 0 < i < a.length;
+        requires 0 < i < a.length && a.length > 0;
         requires a[i] == key;
         // segment < i is sorted
         requires (\forall int x, y; 0 <= x < i && 0 <= y < i; x < y ==> a[x] < a[y]);
+
+        // makes sure that segment <= i is sorted
+        ensures (\forall int x, y; 0 <= x <= i && 0 <= y <= i; x < y ==> a[x] < a[y]);
+        ensures \dl_seqPerm(seqa, \old(seqa));
 
         // shifted segment is larger than key
         ensures (\forall int x; \result < x < i; key < a[x]);
@@ -46,8 +52,12 @@ public class InsertionSort {
         // segment before and including result is unchanged
         ensures (\forall int x; 0 <= x <= \result; \old(a[x]) == a[x]);
 
+        // shift should now also ensure output is permutation of input
+//        ensures \dl_seqPerm(seqa, \old(seqa)); // cannot prove this it seems
+        // ensures \dl_seqPerm(seqa[(\result+1)..i], \old(seqa[(\result+1)..i]));
+
         ensures (\forall int x; i < x < a.length; \old(a[x]) == a[x]);
-        assignable a[0..i]; // remaining part after i cannot have been changed. Also stated explicitly as ensures above
+        assignable a[0..i+1]; // remaining part after i cannot have been changed. Also stated explicitly as ensures above
      */
     private int shift(final int key, final int i) {
         int j = i -  1;
@@ -68,8 +78,10 @@ public class InsertionSort {
          */
         while (j >= 0 && a[j] > key) {
             a[j + 1] = a[j];
+            a[j] = key; // modified version in which array is a permutation after each iteration
             j = j - 1;
         }
+//        a[j + 1] = key;
         return j;
     }
 }

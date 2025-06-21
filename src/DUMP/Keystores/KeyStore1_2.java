@@ -1,4 +1,4 @@
-package KeyStore1_2;
+package DUMP.Keystores;
 
 public class KeyStore1_2 {
     static class Entry {

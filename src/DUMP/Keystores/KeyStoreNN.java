@@ -1,10 +1,10 @@
-package KeyStoreNO;
+package DUMP.Keystores;
 
-public class KeyStoreNO {
+public class KeyStoreNN {
     private int[] keys = new int[10];
-    private /*@nullable*/ Object[] values = new Object[10];
+    private int[] values = new int[10];
 
-    private static final Object NOT_PRESENT = new Object();
+    private static final int NOT_PRESENT = Integer.MIN_VALUE;
 
     private int size;
 
@@ -12,11 +12,10 @@ public class KeyStoreNO {
         private invariant keys != null && values != null && keys != values;
         private invariant keys.length == values.length;
         private invariant 0 <= size && size <= keys.length;
-        private invariant (\forall int i; 0 <= i && i < size; values[i] != null);
         // unique keys
         private invariant (\forall int x, y; 0 <= x && x < y && y < size; keys[x] != keys[y]);
 
-        private invariant \typeof(keys) == \type(int[]) && \typeof(values) == \type(Object[]);
+        private invariant \typeof(keys) == \type(int[]) && \typeof(values) == \type(int[]);
      */
 
     /*@ public normal_behaviour
@@ -51,7 +50,7 @@ public class KeyStoreNO {
         ensures !contains(key) ==> \result == NOT_PRESENT;
         assignable \nothing;
     */
-    public Object /*@pure*/ get(int key) {
+    public int /*@pure*/ get(int key) {
         int index = findIndex(key);
         if(index == -1) {
             return NOT_PRESENT;
@@ -69,7 +68,7 @@ public class KeyStoreNO {
       @*/
     public void enlarge() {
         final int[] newKeys = new int[keys.length == 0 ? 10 : keys.length*2];
-        final Object[] newValues = new Object[values.length == 0 ? 10 : values.length*2];
+        final int[] newValues = new int[values.length == 0 ? 10 : values.length*2];
 
         /*@ loop_invariant 0 <= i && i <= size
           @  && (\forall int x; 0 <= x && x < i; newKeys[x] == \old(keys[x]) && newValues[x] == \old(values[x]));
@@ -86,7 +85,6 @@ public class KeyStoreNO {
 
     /*@
         public normal_behaviour
-        requires value != NOT_PRESENT;
         requires !contains(key) && size < keys.length;
         ensures get(key) == value;
         ensures (\forall int x; 0 <= x < size - 1; keys[x] == \old(keys[x]) && values[x] == \old(values[x]));
@@ -96,7 +94,6 @@ public class KeyStoreNO {
         also
 
         public normal_behaviour
-        requires value != NOT_PRESENT;
         requires contains(key);
         ensures get(key) == value;
         ensures size == \old(size);
@@ -104,7 +101,7 @@ public class KeyStoreNO {
                 keys[x] == \old(keys[x]) && (key ==  keys[x] || values[x] == \old(values[x])));
         assignable values[*];
     */
-    public void put(int key, Object value) {
+    public void put(int key, int value) {
         int index = findIndex(key);
         if (index == -1) {
             keys[size] = key;
@@ -140,3 +137,4 @@ public class KeyStoreNO {
         }
     }
 }
+

@@ -1,6 +1,6 @@
 /* from key textbook, slightly modified */
 
-package Sorting;
+package DUMP.Sorting;
 
 class Sort {
   public int[] a;
