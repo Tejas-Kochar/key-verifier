@@ -1,5 +1,3 @@
-package SortingNew;
-
 public class SwapInsertionSort {
 
     /*@ normal_behaviour
